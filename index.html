@@ -85,7 +85,9 @@ body.locked{overflow:hidden}
 #bar .mark{
   font-family:var(--display);font-style:italic;font-size:clamp(17px,2.4vw,21px);
   color:var(--bright);text-decoration:none;letter-spacing:.01em;
+  display:inline-flex;align-items:center;min-height:40px;padding-right:8px;
 }
+#bar .mark:focus-visible{outline:2px solid var(--red-2);outline-offset:3px;border-radius:4px}
 #bar .mark span{font-family:var(--body);font-style:normal;font-size:10px;font-weight:600;letter-spacing:.2em;color:var(--dim);margin-left:8px;vertical-align:middle}
 
 #menuBtn{
@@ -337,9 +339,12 @@ h2 em{font-style:italic;color:var(--red-2)}
   position:relative;
   background:linear-gradient(178deg,var(--paper),var(--paper-2));
   color:var(--paper-ink);
-  padding:clamp(44px,7vw,86px) clamp(34px,7vw,88px) clamp(52px,7vw,80px);
-  /* marginea mâncată de foc: dreptunghi alb împins cu zgomot fractal */
-  --burn:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 900' preserveAspectRatio='none'><filter id='b' filterUnits='userSpaceOnUse' x='-60' y='-60' width='720' height='1020'><feTurbulence type='fractalNoise' baseFrequency='0.014 0.022' numOctaves='4' seed='9' result='n'/><feDisplacementMap in='SourceGraphic' in2='n' scale='26' xChannelSelector='R' yChannelSelector='G'/></filter><rect x='16' y='16' width='568' height='868' fill='white' filter='url(%23b)'/></svg>");
+  padding:clamp(56px,7vw,86px) clamp(34px,7vw,88px) clamp(62px,7vw,80px);
+  /* Marginea mâncată de foc: dreptunghi alb împins cu zgomot fractal.
+     viewBox înalt (600x1600) pentru că pe telefon scrisoarea e de patru ori
+     mai înaltă decât lată — cu un viewBox pătrăţos arsura se întindea pe
+     verticală şi ajungea peste text. */
+  --burn:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 1600' preserveAspectRatio='none'><filter id='b' filterUnits='userSpaceOnUse' x='-60' y='-60' width='720' height='1720'><feTurbulence type='fractalNoise' baseFrequency='0.014 0.012' numOctaves='4' seed='9' result='n'/><feDisplacementMap in='SourceGraphic' in2='n' scale='24' xChannelSelector='R' yChannelSelector='G'/></filter><rect x='15' y='15' width='570' height='1570' fill='white' filter='url(%23b)'/></svg>");
   -webkit-mask-image:var(--burn);mask-image:var(--burn);
   -webkit-mask-size:100% 100%;mask-size:100% 100%;
   -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
@@ -1389,7 +1394,11 @@ const VIITOR=[
     const n=document.createElementNS(NS,"g");
     n.setAttribute("class","fstar"); n.setAttribute("tabindex","0"); n.setAttribute("role","button");
     n.setAttribute("aria-label","Ce urmează, "+(i+1));
-    n.innerHTML='<circle class="h" cx="'+v.p[0]+'" cy="'+v.p[1]+'" r="20"/><circle class="c" cx="'+v.p[0]+'" cy="'+v.p[1]+'" r="5"/>';
+    // cercul transparent e doar zona de atins: pe telefon steaua desenată
+    // are 24px, prea puţin pentru un deget
+    n.innerHTML='<circle cx="'+v.p[0]+'" cy="'+v.p[1]+'" r="34" fill="transparent"/>'+
+                '<circle class="h" cx="'+v.p[0]+'" cy="'+v.p[1]+'" r="20"/>'+
+                '<circle class="c" cx="'+v.p[0]+'" cy="'+v.p[1]+'" r="5"/>';
     const show=()=>{ g.querySelectorAll(".fstar").forEach(e=>e.classList.remove("on")); n.classList.add("on"); out.textContent=v.t; };
     n.addEventListener("click",show); n.addEventListener("mouseenter",show);
     n.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();show();}});
