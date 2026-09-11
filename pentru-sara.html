@@ -503,22 +503,43 @@ body.gate-on .hero>*{animation-play-state:paused}
 
 .gpaper{
   position:absolute;left:7%;right:7%;bottom:6%;height:88%;
-  background:linear-gradient(178deg,#FFFBF3,#F3E9D8);
+  /* aceeaşi lume ca pagina: bleumarin, licăr albastru sus, roşu jos */
+  background:
+    radial-gradient(118% 88% at 16% 6%,rgba(48,78,172,.55),transparent 58%),
+    radial-gradient(108% 84% at 88% 98%,rgba(158,32,52,.48),transparent 60%),
+    linear-gradient(168deg,#0C1734 0%,#060C20 58%,#03081A 100%);
   border-radius:2px;z-index:3;
-  box-shadow:0 26px 50px -18px rgba(0,0,0,.72),0 0 0 1px rgba(120,96,62,.14);
+  box-shadow:0 26px 50px -18px rgba(0,0,0,.8),0 0 0 1px rgba(232,195,122,.22);
   backface-visibility:hidden;-webkit-backface-visibility:hidden;
   transform:translateZ(1px) translateY(6%);opacity:0;
   transition:transform 1.3s var(--ease),opacity .6s ease;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.7em;
-  padding:6% 9%;text-align:center;
+  padding:11% 10% 7%;text-align:center;
 }
 /* translateZ mare: în preserve-3d adâncimea decide ordinea, nu z-index —
    altfel scrisoarea iese în spatele clapetei deschise */
 .env.out .gpaper{transform:translateZ(30px) translateY(-49%);opacity:1}
-.gpaper .gp-k{font-family:var(--body);font-size:.82em;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:#8A7558}
-.gpaper .gp-t{font-family:var(--display);font-style:italic;font-size:2.5em;line-height:1.16;color:#241A0F}
-.gpaper .gp-s{font-family:var(--hand);font-size:2.2em;color:#8E1622}
-.gpaper .gp-r{width:34%;height:1px;background:rgba(120,96,62,.3)}
+.gpaper .gp-k{font-family:var(--body);font-size:.76em;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:#E2BD77}
+.gpaper .gp-t{font-family:var(--display);font-style:italic;font-size:2.2em;line-height:1.14;color:#F4EFE4;text-shadow:0 2px 18px rgba(6,12,32,.9)}
+.gpaper .gp-s{font-family:var(--hand);font-size:1.95em;color:#FF8A94}
+
+/* ── podoabele cardului: stele statice, trandafiri de aur, ghirlandă ── */
+.orn-defs{position:absolute;width:0;height:0;overflow:hidden}
+.gp-stars{position:absolute;inset:0;z-index:0;pointer-events:none;line-height:0;overflow:hidden;border-radius:2px}
+.gp-stars svg{display:block;width:100%;height:100%}
+.gp-frame{position:absolute;inset:4.6%;z-index:1;border:1px solid rgba(232,195,122,.52);pointer-events:none}
+.gp-frame::after{content:"";position:absolute;inset:2.6%;border:1px solid rgba(226,62,78,.3)}
+.orn{position:absolute;pointer-events:none;line-height:0;z-index:2}
+.orn svg{display:block;width:100%;height:auto;overflow:visible}
+.orn.c{width:23%;aspect-ratio:1}
+.orn.c.tl{left:2.6%;top:3.6%}
+.orn.c.tr{right:2.6%;top:3.6%;transform:scaleX(-1)}
+.orn.c.bl{left:2.6%;bottom:3.6%;transform:scaleY(-1)}
+.orn.c.br{right:2.6%;bottom:3.6%;transform:scale(-1)}
+.orn.garland{left:50%;top:2.4%;width:40%;transform:translateX(-50%)}
+.gp-k,.gp-t,.gp-s,.gp-rule{position:relative;z-index:3}
+.gp-rule{width:68%;line-height:0;margin:.28em 0 .12em}
+.gp-rule svg{display:block;width:100%;height:auto;overflow:visible}
 
 .gate-cta{
   position:absolute;left:0;right:0;bottom:clamp(26px,6vh,58px);
@@ -595,10 +616,17 @@ body.gate-on .hero>*{animation-play-state:paused}
         <div class="face back">
           <div class="b-fold"></div>
           <div class="gpaper">
+            <span class="gp-stars" aria-hidden="true"></span>
+            <span class="gp-frame" aria-hidden="true"></span>
+            <span class="orn garland" aria-hidden="true"></span>
+            <span class="orn c tl" aria-hidden="true"></span>
+            <span class="orn c tr" aria-hidden="true"></span>
+            <span class="orn c bl" aria-hidden="true"></span>
+            <span class="orn c br" aria-hidden="true"></span>
             <span class="gp-k">12 septembrie 2026</span>
             <span class="gp-t">La mulți ani,<br>Sara</span>
-            <span class="gp-r"></span>
-            <span class="gp-s">— Andrei</span>
+            <span class="gp-rule" aria-hidden="true"></span>
+            <span class="gp-s">— Iubitul tău</span>
           </div>
           <div class="b-flap"></div>
           <div class="gseal" aria-hidden="true">
@@ -950,6 +978,95 @@ addEventListener("scroll",()=>{
     wrap.style.transform="translateY("+Math.round(d)+"px) scale("+SCALA+")";
   }
   addEventListener("resize",()=>{ if(gate.classList.contains("lifted")) centreazaScrisoarea(); });
+
+  /* ── podoabele cardului ─────────────────────────
+     Trandafirii sunt spirale concentrice — aşa se desenează o roză
+     răsucită. Frunza porneşte din (0,0) spre dreapta, ca s-o pot roti
+     pe orice vrej. Totul e static: cardul e o previzualizare, nu un joc. */
+  const AUR=
+  '<svg class="orn-defs" aria-hidden="true"><defs>'+
+    '<linearGradient id="aurG" x1="0" y1="0" x2="1" y2="1">'+
+      '<stop offset="0%" stop-color="#F8E9C0"/><stop offset="36%" stop-color="#DDB059"/>'+
+      '<stop offset="68%" stop-color="#B5801F"/><stop offset="100%" stop-color="#F2DCA6"/>'+
+    '</linearGradient>'+
+    '<linearGradient id="aurMoale" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0%" stop-color="#EACB8B" stop-opacity=".8"/>'+
+      '<stop offset="100%" stop-color="#B5801F" stop-opacity=".55"/>'+
+    '</linearGradient>'+
+    '<g id="trandafir">'+
+      '<circle r="11.5" fill="url(#aurMoale)" opacity=".22"/>'+
+      '<path d="M-9.2-2.4a9.2 9.2 0 0 1 18.4 0 9.2 9.2 0 0 1-9.2 9.2" fill="none" stroke="url(#aurG)" stroke-width="1.7" stroke-linecap="round"/>'+
+      '<path d="M-6.3-1a6.3 6.3 0 0 1 12.6 0 6.3 6.3 0 0 1-6.3 6.3" fill="none" stroke="url(#aurG)" stroke-width="1.5" stroke-linecap="round"/>'+
+      '<path d="M-3.5.2a3.5 3.5 0 0 1 7 0 3.5 3.5 0 0 1-3.5 3.5" fill="none" stroke="url(#aurG)" stroke-width="1.35" stroke-linecap="round"/>'+
+      '<path d="M-1.3 1a1.3 1.3 0 1 1 2.6 0" fill="none" stroke="url(#aurG)" stroke-width="1.1" stroke-linecap="round"/>'+
+    '</g>'+
+    '<g id="frunza">'+
+      '<path d="M0 0C4-4.3 11-5.4 15.6-3.5 12.7 1.3 5.4 3.7 0 0z" fill="url(#aurMoale)"/>'+
+      '<path d="M0 0C5.2-1.4 10.7-2.5 15.6-3.5" fill="none" stroke="url(#aurG)" stroke-width=".65" opacity=".9"/>'+
+    '</g>'+
+  '</defs></svg>';
+
+  const COLT=
+  '<svg viewBox="0 0 120 120" aria-hidden="true">'+
+    '<path d="M6 6C30 14 52 30 70 58" fill="none" stroke="url(#aurG)" stroke-width="1.5" stroke-linecap="round" opacity=".85"/>'+
+    '<path d="M6 6C16 30 26 52 30 84" fill="none" stroke="url(#aurG)" stroke-width="1.2" stroke-linecap="round" opacity=".6"/>'+
+    '<use href="#frunza" xlink:href="#frunza" transform="translate(26,15) rotate(26)"/>'+
+    '<use href="#frunza" xlink:href="#frunza" transform="translate(49,31) rotate(40) scale(.9)"/>'+
+    '<use href="#frunza" xlink:href="#frunza" transform="translate(13,33) rotate(76) scale(.85)"/>'+
+    '<use href="#frunza" xlink:href="#frunza" transform="translate(24,61) rotate(90) scale(.8)"/>'+
+    '<use href="#frunza" xlink:href="#frunza" transform="translate(60,46) rotate(52) scale(.7)"/>'+
+    '<use href="#trandafir" xlink:href="#trandafir" transform="translate(12,12) scale(1.12)"/>'+
+    '<use href="#trandafir" xlink:href="#trandafir" transform="translate(41,26) scale(.78)"/>'+
+    '<use href="#trandafir" xlink:href="#trandafir" transform="translate(21,51) scale(.66)"/>'+
+    '<use href="#trandafir" xlink:href="#trandafir" transform="translate(66,56) scale(.55)"/>'+
+  '</svg>';
+
+  const GHIRLANDA=
+  '<svg viewBox="0 0 240 74" aria-hidden="true">'+
+    '<path d="M10 10C60 62 180 62 230 10" fill="none" stroke="url(#aurG)" stroke-width="1.6" stroke-linecap="round" opacity=".9"/>'+
+    '<path d="M10 10C62 54 178 54 230 10" fill="none" stroke="url(#aurG)" stroke-width="1" stroke-linecap="round" opacity=".48"/>'+
+    '<use href="#frunza" xlink:href="#frunza" transform="translate(28,28) rotate(62) scale(.9)"/>'+
+    '<use href="#frunza" xlink:href="#frunza" transform="translate(47,44) rotate(44) scale(.85)"/>'+
+    '<use href="#frunza" xlink:href="#frunza" transform="translate(72,54) rotate(24) scale(.78)"/>'+
+    '<use href="#frunza" xlink:href="#frunza" transform="translate(212,28) rotate(118) scale(.9)"/>'+
+    '<use href="#frunza" xlink:href="#frunza" transform="translate(193,44) rotate(136) scale(.85)"/>'+
+    '<use href="#frunza" xlink:href="#frunza" transform="translate(168,54) rotate(156) scale(.78)"/>'+
+    '<use href="#trandafir" xlink:href="#trandafir" transform="translate(120,57) scale(1)"/>'+
+    '<use href="#trandafir" xlink:href="#trandafir" transform="translate(95,52) scale(.6)"/>'+
+    '<use href="#trandafir" xlink:href="#trandafir" transform="translate(145,52) scale(.6)"/>'+
+    '<use href="#trandafir" xlink:href="#trandafir" transform="translate(10,10) scale(.72)"/>'+
+    '<use href="#trandafir" xlink:href="#trandafir" transform="translate(230,10) scale(.72)"/>'+
+  '</svg>';
+
+  const VINIETA=
+  '<svg viewBox="0 0 200 30" aria-hidden="true">'+
+    '<path d="M6 15H72" stroke="url(#aurG)" stroke-width="1.3" stroke-linecap="round" opacity=".95" fill="none"/>'+
+    '<path d="M128 15H194" stroke="url(#aurG)" stroke-width="1.3" stroke-linecap="round" opacity=".95" fill="none"/>'+
+    '<use href="#frunza" xlink:href="#frunza" transform="translate(74,15) rotate(-18) scale(.72)"/>'+
+    '<use href="#frunza" xlink:href="#frunza" transform="translate(126,15) rotate(162) scale(.72)"/>'+
+    '<use href="#trandafir" xlink:href="#trandafir" transform="translate(100,15) scale(.85)"/>'+
+  '</svg>';
+
+  // stele fixe, generate cu o sămânţă stabilă ca să arate la fel de fiecare dată
+  const STELE=(function(){
+    let s=20260912;
+    const r=()=>{ s=(s*1664525+1013904223)&0x7fffffff; return s/0x7fffffff; };
+    let out='<svg viewBox="0 0 300 203" preserveAspectRatio="xMidYMid slice" aria-hidden="true">';
+    for(let i=0;i<110;i++){
+      const x=r()*300, y=r()*203;
+      if(Math.abs(x-150)<92 && Math.abs(y-101)<42) continue;   // lasă loc textului
+      const t=r(), rad=(r()*.9+.35).toFixed(2);
+      const col=t<.13?"#FF9AA2":t<.42?"#9FBCF2":"#EAF0FF";
+      out+='<circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="'+rad+'" fill="'+col+'" opacity="'+(r()*.55+.22).toFixed(2)+'"/>';
+    }
+    return out+'</svg>';
+  })();
+
+  gate.insertAdjacentHTML("afterbegin",AUR);
+  gate.querySelector(".gp-stars").innerHTML=STELE;
+  gate.querySelector(".orn.garland").innerHTML=GHIRLANDA;
+  gate.querySelector(".gp-rule").innerHTML=VINIETA;
+  gate.querySelectorAll(".orn.c").forEach(e=>e.innerHTML=COLT);
 
   const PASI=["Atinge plicul","Rupe sigiliul","Deschide-l","Scoate scrisoarea","Citește-o"];
   const dots=[...gate.querySelectorAll(".gate-steps b")];
