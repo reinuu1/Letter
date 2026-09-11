@@ -297,9 +297,37 @@ h2 em{font-style:italic;color:var(--red-2)}
 .heart-meter i{position:absolute;inset:0 auto 0 0;background:linear-gradient(90deg,var(--red),var(--red-2));width:0}
 
 /* ── scrisoarea ────────────────────────────────── */
-.letter-wrap{position:relative;max-width:740px;margin:0 auto}
-.letter{position:relative;background:linear-gradient(178deg,var(--paper),var(--paper-2));color:var(--paper-ink);padding:clamp(32px,6.5vw,78px) clamp(24px,6.5vw,80px) clamp(42px,6vw,66px);box-shadow:0 50px 110px -36px rgba(0,0,0,.86),0 0 0 1px rgba(255,255,255,.07);border-radius:2px}
-.letter::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);opacity:.7}
+.letter-stage{position:relative;max-width:740px;margin:0 auto}
+.letter-wrap{
+  position:relative;
+  /* umbrele urmăresc conturul zdrenţuit, nu dreptunghiul: de aceea filter, nu box-shadow */
+  filter:
+    drop-shadow(0 0 1px rgba(52,22,6,.95))
+    drop-shadow(0 0 4px rgba(74,32,8,.8))
+    drop-shadow(0 0 14px rgba(168,78,22,.32))
+    drop-shadow(0 44px 82px rgba(0,0,0,.78));
+}
+#ashC{position:absolute;inset:-9% -7%;width:114%;height:118%;pointer-events:none;z-index:3}
+.letter{
+  position:relative;
+  background:linear-gradient(178deg,var(--paper),var(--paper-2));
+  color:var(--paper-ink);
+  padding:clamp(44px,7vw,86px) clamp(34px,7vw,88px) clamp(52px,7vw,80px);
+  /* marginea mâncată de foc: dreptunghi alb împins cu zgomot fractal */
+  --burn:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 900' preserveAspectRatio='none'><filter id='b' filterUnits='userSpaceOnUse' x='-60' y='-60' width='720' height='1020'><feTurbulence type='fractalNoise' baseFrequency='0.014 0.022' numOctaves='4' seed='9' result='n'/><feDisplacementMap in='SourceGraphic' in2='n' scale='26' xChannelSelector='R' yChannelSelector='G'/></filter><rect x='16' y='16' width='568' height='868' fill='white' filter='url(%23b)'/></svg>");
+  -webkit-mask-image:var(--burn);mask-image:var(--burn);
+  -webkit-mask-size:100% 100%;mask-size:100% 100%;
+  -webkit-mask-repeat:no-repeat;mask-repeat:no-repeat;
+}
+/* pârjolul dinspre margine spre interior */
+.scorch{
+  position:absolute;inset:0;pointer-events:none;z-index:2;mix-blend-mode:multiply;
+  background:
+    linear-gradient(to right,rgba(46,20,6,.92),rgba(128,66,20,.42) 2%,rgba(190,130,70,.16) 5%,transparent 9%),
+    linear-gradient(to left,rgba(46,20,6,.92),rgba(128,66,20,.42) 2%,rgba(190,130,70,.16) 5%,transparent 9%),
+    linear-gradient(to bottom,rgba(46,20,6,.92),rgba(128,66,20,.42) 1.4%,rgba(190,130,70,.16) 3.4%,transparent 6%),
+    linear-gradient(to top,rgba(46,20,6,.92),rgba(128,66,20,.42) 1.4%,rgba(190,130,70,.16) 3.4%,transparent 6%);
+}
 .letter::after{content:"";position:absolute;inset:0;pointer-events:none;border-radius:2px;background:radial-gradient(88% 60% at 12% 4%,rgba(255,255,255,.5),transparent 60%),radial-gradient(70% 50% at 92% 96%,rgba(120,96,62,.14),transparent 62%);mix-blend-mode:multiply;opacity:.55}
 .letter>*{position:relative;z-index:1}
 .letter .to{font-family:var(--body);font-size:10px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:var(--paper-dim);margin:0 0 28px}
@@ -371,10 +399,11 @@ h2 em{font-style:italic;color:var(--red-2)}
 body.gate-on #bar,body.gate-on #music,body.gate-on #prog{opacity:0;pointer-events:none;transition:opacity .4s}
 body.gate-on .hero>*{animation-play-state:paused}
 
-.gate-inner{display:flex;flex-direction:column;align-items:center;gap:clamp(24px,5vh,46px);width:100%}
-.env-wrap{perspective:1500px;width:min(540px,92vw);transition:transform 1.3s var(--ease)}
-/* când iese scrisoarea, plicul coboară ca să încapă toată compoziţia */
-#gate.lifted .env-wrap{transform:translateY(13%)}
+.gate-inner{display:flex;flex-direction:column;align-items:center;width:100%}
+/* a treia limită ţine plicul întreg şi pe ecran culcat, unde înălţimea e mică */
+.env-wrap{perspective:1500px;width:min(540px,92vw,78vh);transition:transform 1.3s var(--ease)}
+/* deplasarea la scoaterea scrisorii o calculează JS din măsurători reale,
+   ca hârtia să pice pe mijloc fără să intre peste indicator */
 .env{
   position:relative;width:100%;aspect-ratio:1.52/1;
   transform-style:preserve-3d;
@@ -485,13 +514,14 @@ body.gate-on .hero>*{animation-play-state:paused}
 }
 /* translateZ mare: în preserve-3d adâncimea decide ordinea, nu z-index —
    altfel scrisoarea iese în spatele clapetei deschise */
-.env.out .gpaper{transform:translateZ(30px) translateY(-57%);opacity:1}
+.env.out .gpaper{transform:translateZ(30px) translateY(-49%);opacity:1}
 .gpaper .gp-k{font-family:var(--body);font-size:.82em;font-weight:700;letter-spacing:.26em;text-transform:uppercase;color:#8A7558}
 .gpaper .gp-t{font-family:var(--display);font-style:italic;font-size:2.5em;line-height:1.16;color:#241A0F}
 .gpaper .gp-s{font-family:var(--hand);font-size:2.2em;color:#8E1622}
 .gpaper .gp-r{width:34%;height:1px;background:rgba(120,96,62,.3)}
 
 .gate-cta{
+  position:absolute;left:0;right:0;bottom:clamp(26px,6vh,58px);
   display:flex;flex-direction:column;align-items:center;gap:14px;
   font-size:10.5px;font-weight:700;letter-spacing:.26em;text-transform:uppercase;
   color:var(--soft);pointer-events:none;text-align:center;
@@ -773,8 +803,14 @@ body.gate-on .hero>*{animation-play-state:paused}
   <!-- 6 · SCRISOAREA -->
   <section id="scrisoare">
     <p class="eyebrow rev">Șase · Scrisoarea</p>
-    <div class="letter-wrap rev d1">
-      <article class="letter" id="letter"><p class="to">Pentru Sara, de ziua ei</p></article>
+    <div class="letter-stage">
+      <div class="letter-wrap rev d1">
+        <article class="letter" id="letter">
+          <span class="scorch" aria-hidden="true"></span>
+          <p class="to">Pentru Sara, de ziua ei</p>
+        </article>
+      </div>
+      <canvas id="ashC" aria-hidden="true"></canvas>
     </div>
   </section>
 
@@ -813,7 +849,7 @@ body.gate-on .hero>*{animation-play-state:paused}
 /* ═══ DATE ═══════════════════════════════════════ */
 const CONFIG = {
   impreunaDin: "2026-08-30",
-  revedere:    "2026-10-15T12:00:00",  // ← pune data exactă din octombrie
+  revedere:    "2026-10-01T00:00:00",  // începutul lui octombrie
 
   // Imaginea de pe timbru. Lasă gol ("") ca să rămână desenul original
   // cu luna și steaua. Ca să pui poza ta, scrie aici un data URI:
@@ -898,6 +934,23 @@ addEventListener("scroll",()=>{
     '</g>'+
   '</svg>';
 
+  /* Centrează hârtia pe verticală când iese din plic.
+     Hârtia are înălţimea 88% din plic, stă la 6% de bază şi urcă 49% din ea,
+     deci centrul ei ajunge la 8,6% sub marginea de sus a plicului (după scalare). */
+  const wrap=gate.querySelector(".env-wrap"), cta=gate.querySelector(".gate-cta");
+  const SCALA=.96;
+  function centreazaScrisoarea(){
+    wrap.style.transform="";
+    const r=wrap.getBoundingClientRect();
+    if(!r.height) return;
+    let d=innerHeight/2-(r.top+r.height*.086);
+    const josPlic=r.top+r.height*(.5+.5*SCALA);
+    const limita=(cta?cta.getBoundingClientRect().top:innerHeight)-18-josPlic;
+    d=Math.max(0,Math.min(d,limita));
+    wrap.style.transform="translateY("+Math.round(d)+"px) scale("+SCALA+")";
+  }
+  addEventListener("resize",()=>{ if(gate.classList.contains("lifted")) centreazaScrisoarea(); });
+
   const PASI=["Atinge plicul","Rupe sigiliul","Deschide-l","Scoate scrisoarea","Citește-o"];
   const dots=[...gate.querySelectorAll(".gate-steps b")];
   let st=0, busy=false;
@@ -909,7 +962,7 @@ addEventListener("scroll",()=>{
     if(st===1) env.classList.add("flipped");
     else if(st===2) env.classList.add("cracked");
     else if(st===3) env.classList.add("open");
-    else if(st===4){ env.classList.add("out"); gate.classList.add("lifted"); }
+    else if(st===4){ env.classList.add("out"); gate.classList.add("lifted"); centreazaScrisoarea(); }
     else { finish(); return; }
     dots.forEach((d,i)=>d.classList.toggle("on",i<=st));
     label.textContent=PASI[st];
@@ -1243,13 +1296,13 @@ deck("#vows",[
   const l=$("#letter");
   const LUNI=["ianuarie","februarie","martie","aprilie","mai","iunie","iulie","august","septembrie","octombrie","noiembrie","decembrie"];
   [
-    { o:1, t:"Nu sunt bun la scris scrisori. Dar azi e ziua ta, așa că hai să încercăm." },
-    { t:"Suntem la început. Nu avem încă ani de amintiri și nici povești de spus la masă. Și totuși scriu asta foarte liniștit — pentru că uneori nu ai nevoie de timp ca să știi. Ai nevoie de omul potrivit. Restul e doar calendar." },
-    { t:"Ce știu sigur e atât: țin enorm la tine și te iubesc. Îmi ești alături în fiecare zi, dintr-un alt oraș, dintr-o altă țară, cu o oră în urmă — și tot reușești să fii cel mai prezent om din viața mea. Primești același lucru înapoi." },
-    { t:"Ești, desigur, antipatică, nesuferită și stricată. Și tot nu aș schimba nimic." },
-    { t:"Împlinești 22 de ani și lumea o să-ți spună că trebuie să te grăbești. Nu trebuie. Ai timp, ai un an întreg în față, iar eu îmi doresc un singur lucru pentru tine: să fii la fel de blândă cu tine cum ești cu mine." },
-    { t:"În octombrie, când te văd, prima dată nu zic nimic. Doar te țin în brațe. Restul discutăm după." },
-    { t:"La mulți ani. Te iubesc mai mult decât încape într-o pagină web." }
+    { o:1, t:"Nu sunt bun la scris scrisori. Dar azi e ziua ta, așa că vreau să încerc, Bibiș." },
+    { t:"Suntem la început. Nu avem încă ani de amintiri și nici povești de spus la masă. Și totuși scriu asta foarte liniștit, pentru că uneori nu ai nevoie de timp ca să știi. Ai nevoie de omul potrivit. Restul e doar calendar." },
+    { t:"Ce știu sigur e atât: țin enorm la tine și te iubesc, m-am îndrăgostit de tine. Îmi ești alături în fiecare zi, dintr-un alt oraș, dintr-o altă țară, cu o oră în urmă, și tot reușești să fii cel mai prezent om din viața mea. Sper că simți același lucru înapoi." },
+    { t:"Ești, desigur, antipatică, nesuferită și stricată. Mă enervezi de multe ori și tot nu aș schimba nimic." },
+    { t:"Împlinești 22 de ani și lumea o să-ți spună că trebuie să te grăbești, să îți așezi mai repede viața. Nu trebuie. Ai timp, lucrurile bune necesită răbdare și fiecare are ritmul său, iar eu îmi doresc un singur lucru pentru tine: să fii la fel de blândă și răbdătoare cu tine cum ești cu mine." },
+    { t:"În octombrie, când te văd, prima dată nu zic nimic. Doar te țin în brațe. Restul discutăm pe urmă." },
+    { t:"La mulți ani, pui mic!! Îți doresc doar experiențe frumoase, sănătate, multă multă răbdare cu mine și numai oameni de calitate în viața ta. Te iubesc mai mult decât încape într-o pagină web." }
   ].forEach(p=>{
     const el=document.createElement("p");
     if(p.o) el.className="opening";
@@ -1258,6 +1311,77 @@ deck("#vows",[
   const n=new Date(),sig=document.createElement("div"); sig.className="sig";
   sig.innerHTML='<span class="who"><span class="name">Andrei</span><span class="date">'+n.getDate()+" "+LUNI[n.getMonth()]+" "+n.getFullYear()+' · București</span></span><span class="wax" aria-hidden="true"><span>A</span></span>';
   l.appendChild(sig);
+})();
+
+/* ── cenuşa din jurul scrisorii ────────────────── */
+(function(){
+  const cv=$("#ashC"); if(!cv) return;
+  const ctx=cv.getContext("2d");
+  const stage=cv.parentElement;
+  let W=0,H=0,D=1,fulgi=[],viu=false,t=0;
+
+  function size(){
+    D=Math.min(devicePixelRatio||1,2);
+    const r=cv.getBoundingClientRect();
+    if(!r.width||!r.height) return;
+    W=cv.width=Math.round(r.width*D); H=cv.height=Math.round(r.height*D);
+    const n=Math.round(r.width*r.height/4200);
+    fulgi=Array.from({length:Math.max(60,Math.min(n,260))},()=>naste(true));
+  }
+  function naste(oriunde){
+    const jar=Math.random()<.14;
+    // se nasc mai des pe lângă margini, de unde arde hârtia
+    let x=Math.random()*W;
+    if(Math.random()<.55) x = Math.random()<.5 ? Math.random()*W*.22 : W-Math.random()*W*.22;
+    return {
+      x,
+      y:oriunde?Math.random()*H:H+10*D,
+      vx:(Math.random()-.5)*.24*D,
+      vy:-(Math.random()*.34+.07)*D,
+      r:(jar?Math.random()*1.7+1.1:Math.random()*2.3+.7)*D,
+      rot:Math.random()*6.283,
+      vr:(Math.random()-.5)*.02,
+      a:Math.random()*.55+.3,
+      faza:Math.random()*6.283,
+      jar
+    };
+  }
+  function cadru(){
+    if(!viu||!W){ requestAnimationFrame(cadru); return; }
+    t+=.016;
+    ctx.clearRect(0,0,W,H);
+    for(let i=0;i<fulgi.length;i++){
+      const f=fulgi[i];
+      f.x+=f.vx+Math.sin(t*.7+f.faza)*.16*D;
+      f.y+=f.vy;
+      f.rot+=f.vr;
+      if(f.y<-14*D||f.x<-14*D||f.x>W+14*D){ fulgi[i]=naste(false); continue; }
+      const puls=.6+.4*Math.sin(t*1.6+f.faza);
+      ctx.save();
+      ctx.translate(f.x,f.y);
+      ctx.rotate(f.rot);
+      if(f.jar){
+        ctx.shadowColor="rgba(255,150,60,.85)";
+        ctx.shadowBlur=9*D;
+        ctx.fillStyle="rgba(255,"+Math.round(150+70*puls)+",90,"+(f.a*puls+.25)+")";
+        ctx.beginPath(); ctx.arc(0,0,f.r*.6,0,6.283); ctx.fill();
+      }else{
+        ctx.fillStyle="rgba("+Math.round(168+44*puls)+","+Math.round(162+42*puls)+",156,"+(f.a*.85)+")";
+        ctx.fillRect(-f.r,-f.r*.55,f.r*2,f.r*1.1);
+      }
+      ctx.restore();
+    }
+    requestAnimationFrame(cadru);
+  }
+
+  size();
+  addEventListener("resize",size);
+  if(window.ResizeObserver) new ResizeObserver(size).observe(stage);
+  // arde doar cât e scrisoarea pe ecran
+  if("IntersectionObserver" in window){
+    new IntersectionObserver(es=>{ viu=es[0].isIntersecting; if(viu&&!W) size(); },{rootMargin:"200px"}).observe(stage);
+  } else viu=true;
+  requestAnimationFrame(cadru);
 })();
 
 /* ── numărătoarea ──────────────────────────────── */
