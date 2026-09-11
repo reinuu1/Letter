@@ -26,7 +26,7 @@
 </style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Manrope:wght@200;300;400;500;600;700&family=Caveat:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Manrope:wght@200;300;400;500;600;700&family=Caveat:wght@400;500;600&family=Cinzel:wght@500;600;700&display=swap">
 
 <style>
 :root{
@@ -418,6 +418,7 @@ body.gate-on .hero>*{animation-play-state:paused}
 }
 .face::after{
   content:"";position:absolute;inset:0;border-radius:3px;pointer-events:none;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
   background:radial-gradient(80% 60% at 14% 6%,rgba(255,255,255,.55),transparent 62%),
              radial-gradient(70% 55% at 88% 94%,rgba(120,96,62,.16),transparent 64%);
   mix-blend-mode:multiply;opacity:.5;
@@ -445,44 +446,63 @@ body.gate-on .hero>*{animation-play-state:paused}
   background:linear-gradient(180deg,#F5EBD9,#E6D5B7);
   clip-path:polygon(0 0,100% 0,50% 100%);
   transform-origin:top center;transform:translateZ(3px) rotateX(0deg);
-  transition:transform 1.25s var(--ease);
   z-index:4;
+  /* ascunsă cât timp vedem faţa: în preserve-3d copiii nu mai sunt acoperiţi
+     de backface-visibility a feţei, aşa că i-o punem noi */
+  visibility:hidden;
+  transition:transform 1.25s var(--ease),visibility 0s linear 0s;
 }
+.env.flipped .b-flap{visibility:visible;transition:transform 1.25s var(--ease),visibility 0s linear .46s}
 .b-flap::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.4),transparent 60%);clip-path:inherit}
 .env.open .b-flap{transform:translateZ(3px) rotateX(-174deg)}
 .env.out .b-flap{z-index:1}
-.b-fold{position:absolute;inset:0;z-index:2;background:
+.b-fold{position:absolute;inset:0;z-index:2;backface-visibility:hidden;-webkit-backface-visibility:hidden;background:
   linear-gradient(to bottom right,transparent calc(50% - .5px),rgba(120,96,62,.18) 50%,transparent calc(50% + .5px)) left bottom/50% 62% no-repeat,
   linear-gradient(to bottom left,transparent calc(50% - .5px),rgba(120,96,62,.18) 50%,transparent calc(50% + .5px)) right bottom/50% 62% no-repeat}
 
 .gseal{
-  position:absolute;left:50%;top:54%;transform:translate(-50%,-50%);
-  width:clamp(52px,11.5vw,76px);aspect-ratio:1;z-index:6;pointer-events:none;
+  position:absolute;left:50%;top:53%;
+  /* translateZ peste clapetă (3px): altfel vârful ei taie o pană din ceară */
+  transform:translate(-50%,-50%) translateZ(10px);
+  width:20%;min-width:60px;aspect-ratio:1;
+  z-index:6;pointer-events:none;
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
 }
 .gseal .h{
   position:absolute;inset:0;
-  background:radial-gradient(58% 52% at 34% 28%,#E0505C,#B31F2D 46%,#8E1622 72%,#6B0F19 100%);
-  border-radius:48% 52% 51% 49%/49% 48% 52% 51%;
-  box-shadow:0 8px 18px -6px rgba(90,10,20,.7),inset 0 -3px 7px rgba(60,6,14,.6),inset 0 3px 8px rgba(255,150,158,.3);
-  transition:transform 1s var(--ease),opacity .9s ease;
+  background:
+    radial-gradient(42% 38% at 33% 26%,rgba(255,176,182,.5),transparent 64%),
+    radial-gradient(62% 56% at 38% 32%,#E4586A,#C22636 42%,#96182A 70%,#6A0E19 100%);
+  border-radius:47% 53% 51% 49%/50% 47% 53% 50%;
+  box-shadow:
+    0 12px 24px -8px rgba(80,8,18,.75),
+    inset 0 -5px 10px rgba(52,4,12,.62),
+    inset 0 4px 11px rgba(255,166,174,.34);
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
+  transition:transform 1.05s var(--ease),opacity 1s ease;
 }
-.gseal .h.l{clip-path:polygon(0 0,52% 0,46% 100%,0 100%)}
-.gseal .h.r{clip-path:polygon(52% 0,100% 0,100% 100%,46% 100%)}
-.gseal .mono{
+/* crăpătură zimţată, ca ceara adevărată */
+.gseal .h.l{clip-path:polygon(0 0,54% 0,47% 21%,57% 45%,43% 69%,52% 100%,0 100%)}
+.gseal .h.r{clip-path:polygon(54% 0,100% 0,100% 100%,52% 100%,43% 69%,57% 45%,47% 21%)}
+/* litera stă în ambele jumătăţi, deci se rupe odată cu ceara */
+/* litera e în ambele jumătăţi, aşa că se rupe odată cu ceara.
+   em-ul se raportează la font-size-ul feţei, deci scalează cu plicul. */
+.gseal .h b{
   position:absolute;inset:0;display:grid;place-items:center;
-  font-family:var(--display);font-style:italic;font-size:2.1em;color:#5E0C16;
-  text-shadow:0 1px 0 rgba(255,160,168,.34),0 -1px 1px rgba(60,4,12,.55);
-  transition:opacity .45s ease;
+  font-family:"Cinzel",var(--display),serif;font-weight:700;
+  font-size:3.7em;line-height:1;color:#5A0A14;
+  text-shadow:0 1.5px 0 rgba(255,178,184,.44),0 -1.5px 2px rgba(52,2,10,.72);
+  letter-spacing:.04em;padding-bottom:.04em;
 }
-.env.cracked .gseal .h.l{transform:translate(-26%,16%) rotate(-24deg);opacity:0}
-.env.cracked .gseal .h.r{transform:translate(26%,22%) rotate(28deg);opacity:0}
-.env.cracked .gseal .mono{opacity:0}
+.env.cracked .gseal .h.l{transform:translate(-30%,18%) rotate(-26deg);opacity:0}
+.env.cracked .gseal .h.r{transform:translate(30%,24%) rotate(30deg);opacity:0}
 
 .gpaper{
   position:absolute;left:7%;right:7%;bottom:6%;height:88%;
   background:linear-gradient(178deg,#FFFBF3,#F3E9D8);
   border-radius:2px;z-index:3;
   box-shadow:0 26px 50px -18px rgba(0,0,0,.72),0 0 0 1px rgba(120,96,62,.14);
+  backface-visibility:hidden;-webkit-backface-visibility:hidden;
   transform:translateZ(1px) translateY(6%);opacity:0;
   transition:transform 1.3s var(--ease),opacity .6s ease;
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.7em;
@@ -577,8 +597,8 @@ body.gate-on .hero>*{animation-play-state:paused}
             <span class="gp-s">— Andrei</span>
           </div>
           <div class="b-flap"></div>
-          <div class="gseal">
-            <span class="h l"></span><span class="h r"></span><span class="mono">A</span>
+          <div class="gseal" aria-hidden="true">
+            <span class="h l"><b>A</b></span><span class="h r"><b>A</b></span>
           </div>
         </div>
 
@@ -891,16 +911,16 @@ addEventListener("scroll",()=>{
   $("#markSlot").innerHTML=
   '<svg viewBox="0 0 220 96" role="presentation">'+
     '<g fill="none" stroke="#2C3348" stroke-width="1.5" stroke-linecap="round" opacity=".85">'+
-      '<path d="M4 30q14-9 28 0t28 0 28 0"/><path d="M4 42q14-9 28 0t28 0 28 0"/>'+
-      '<path d="M4 54q14-9 28 0t28 0 28 0"/><path d="M4 66q14-9 28 0t28 0 28 0"/>'+
+      '<path d="M2 30q14-9 28 0t28 0 28 0"/><path d="M2 42q14-9 28 0t28 0 28 0"/>'+
+      '<path d="M2 54q14-9 28 0t28 0 28 0"/><path d="M2 66q14-9 28 0t28 0 28 0"/>'+
     '</g>'+
-    '<g transform="translate(158,46) rotate(-9)" fill="none" stroke="#2C3348" stroke-width="1.6" opacity=".85">'+
-      '<circle r="34"/><circle r="27"/>'+
+    '<g transform="translate(130,46) rotate(-9)" fill="none" stroke="#2C3348" stroke-width="1.6" opacity=".85">'+
+      '<circle r="31"/><circle r="24.5"/>'+
     '</g>'+
-    '<g transform="translate(158,46) rotate(-9)" fill="#2C3348" opacity=".85" font-family="Manrope,sans-serif" text-anchor="middle">'+
-      '<text y="-12" font-size="8.4" font-weight="700" letter-spacing="1.4">BUCUREȘTI</text>'+
-      '<text y="3" font-size="10.5" font-weight="700" letter-spacing=".6">12.IX.26</text>'+
-      '<text y="16" font-size="6.6" font-weight="600" letter-spacing="1.8">ROMÂNIA</text>'+
+    '<g transform="translate(130,46) rotate(-9)" fill="#2C3348" opacity=".85" font-family="Manrope,sans-serif" text-anchor="middle">'+
+      '<text y="-10" font-size="7.4" font-weight="700" letter-spacing="1.2">BUCUREȘTI</text>'+
+      '<text y="3" font-size="8.4" font-weight="700" letter-spacing="-.15">11.09.2026</text>'+
+      '<text y="14.5" font-size="6" font-weight="600" letter-spacing="1.6">ROMÂNIA</text>'+
     '</g>'+
   '</svg>';
 
